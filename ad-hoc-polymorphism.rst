@@ -272,16 +272,44 @@ We can still talk about orphans and overlap here -
 Part 5 - Problems with eschewing canonicity
 ===========================================
 
-Less well-studied compared to type classes
-------------------------------------------
+Types need to keep track of corresponding instances
+---------------------------------------------------
+
+Note: This is sometimes called the "Set Ordering problem" or the "Hash table
+problem".
+
+If canonicity is guaranteed, the signature of a set union function will look
+like::
+
+    val union : forall a. Ord a => Set a -> Set a -> Set a
+
+However, in the absence of canonicity, this function cannot be implemented as
+the two sets might have been created with different ``Ord`` instances.
+
+OCaml solves this problem using parameterized modules (in the absence of
+implicits). ``Set`` acts as a parameterized module that takes in an ``Ord``
+module (say ``IntAscendingOrd``) and creates another module
+(say ``IntAscendingSet``) with a set type and functions (such as ``union``)
+which operate on that type. If you apply ``Set`` to another ``Ord`` module
+(say ``IntDescendingOrd``), that creates a distinct module (say ``IntDescendingSet``).
+``IntAscendingSet.union`` cannot operate on values of type ``IntDescendingSet.t``,
+so crisis is averted. This strategy carries over to implicits in a
+straight-forward manner. Hence, the signature of ``union`` becomes::
+
+    val union : {O : Ord} -> Set(O).t -> Set(O).t -> Set(O).t
+
+Workaround(s): With a little bit of practice (you must educate your users!),
+you can get the hang of writing APIs without such soundness issues.
+
+Less well-studied in mainstream languages compared to type classes
+------------------------------------------------------------------
 
 If you want to implement type classes, you can read the various papers related
 to Haskell's type classes, as well as play around with the implementations in
-Haskell, Purescript, Rust (traits), Swift (protocols), Idris (interfaces) and
-more.
+Haskell, Purescript, Rust (traits), Swift (protocols) and more.
 
-On the other hand, if you want to forego canonicity - the only two practical
-options you can study (that I know of) are Scala and OCaml. Moreover, the
+On the other hand, if you want to forego canonicity - the two mainstream
+languages that you can study are Scala and OCaml. [#f16]_ Moreover, the
 OCaml implementation is very much work-in-progress (there is a prototype
 though); there isn't a paper with the technical details of type checking for it
 yet.
@@ -308,7 +336,7 @@ Path-independence proofs (alt. diamonds are a programmer's worst enemy)
                 in the absence of canonicity?
 
    While the above example is contrived (for brevity), such a situation
-   come up very frequently in Haskell code, where ``Monad`` is a common
+   comes up very frequently in Haskell code, where ``Monad`` is a common
    subclass across several different constraints. [#f14]_
 
 2. Deriving instances through multiple paths - If bounds/instances
@@ -467,3 +495,8 @@ didn't. You might still want to look at those. [#f8]_  [#f9]_
 .. [#f15] `Mixin' up the ML module system
           <https://storage.googleapis.com/pub-tools-public-publication-data/pdf/43982.pdf>`_ -
           Andreas Rossberg and Derek Dreyer.
+
+.. [#f16] Brendan Zabarauskas `points out
+          <https://www.reddit.com/r/ProgrammingLanguages/comments/awoi1d/principled_adhoc_polymorphism/eho42r0>`_
+          that Idris interfaces, Agda's instance arguments, Coq type classes
+          and Lean type classes all do not force canonicity.
