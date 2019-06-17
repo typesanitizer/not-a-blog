@@ -181,7 +181,7 @@ Troublesome Orphans (orphans allowed)
 
 If orphan instances are permitted, then ensuring canonicity is more expensive,
 as you need a global check to do so. This corresponds to a
-long open GHC ticket `<#2356 https://ghc.haskell.org/trac/ghc/ticket/2356>`_.
+long open GHC ticket `#2356 <https://ghc.haskell.org/trac/ghc/ticket/2356>`_.
 
 If the corresponding checks are skipped (for performance reasons or otherwise),
 one needs to be particularly careful around using orphan instances as the
@@ -195,8 +195,8 @@ Mental complexity with selection rules (overlap allowed)
 1. Understanding the rules as an end-user - In Haskell, overlapping instances
    do not work for matching instance heads. This is sometimes a source of
    confusion for someone trying out overlapping instances
-   (`<SO 1 https://stackoverflow.com/a/16776676/2682729>`_,
-   `<SO 2 https://stackoverflow.com/a/30707290/2682729>`_).
+   (`SO 1 <https://stackoverflow.com/a/16776676/2682729>`_,
+   `SO 2 <https://stackoverflow.com/a/30707290/2682729>`_).
 
 2. Possibly unexpected "time travel" - code written in a compilation unit can
    change the semantics of code written its *dependencies*::
