@@ -102,6 +102,8 @@ There are several places to ask questions. The [r/haskell](https://www.reddit.co
 subreddit has several links in the sidebar, which you may find useful. If you
 find general functional programming chat groups (e.g. on Slack or Discord), it
 is likely that someone there might be able to help you with Haskell-related questions.
+For example, you could try the [FPChat Slack channel #haskell-beginners](https://functionalprogramming.slack.com/messages/C04641JCU/)
+([invite](https://fpchat-invite.herokuapp.com/)).
 
 Twitter is also an option (although the medium makes it harder to communicate IMO),
 use the `#haskell` tag.
@@ -198,12 +200,22 @@ as well.
 
 Setting up CI can be frustrating sometimes.
 Like with a lot of programming problems, it can be solved by copy-and-paste.
-For example, [here](https://github.com/kowainik/relude/blob/master/.travis.yml) is
-the Travis CI file for the `relude` library. Or pick some other library, doesn't
-matter.
+
+If you're using `stack` as your build tool, the documentation describes how
+to setup Travis CI [here](https://docs.haskellstack.org/en/stable/travis_ci/).
+
+You could also get the CI configuration from another Haskell library (e.g. if
+you're using `cabal`). For example,
+[here](https://github.com/kowainik/relude/blob/master/.travis.yml) is
+the Travis CI file for the `relude` library, which has configuration for both
+`stack` and `cabal`. Or pick some other library, doesn't matter.
 
 If you want something more configurable and cross-platform, take a look at
 [packcheck](https://github.com/composewell/packcheck).
+
+If you're using Gitlab to host your source code, Gitlab CI is also a solid
+option. (TODO: Add a link on how to setup Gitlab CI easily for a Haskell
+project.)
 
 ## Libraries
 
@@ -266,6 +278,11 @@ If you really must, use a partial function but write a short justification in
 a comment for why there won't be any exceptions thrown. Sometimes, trying to
 write that justification will uncover a bug in your reasoning.
 
+IO related functions are somewhat notorious for throwing exceptions for
+relatively common errors, such as a missing file. Try to be extra careful and
+think about possible failure modes that you want to address when working with
+functions in IO.
+
 ### Using records
 
 Haskell's built-in records work just fine for small to medium applications.
@@ -283,6 +300,10 @@ If you *really* must use a lens library (to see what all the fuss is all about o
 otherwise), I recommend using `microlens` (or `microlens-platform`). Read
 this [lens tutorial](https://hackage.haskell.org/package/lens-tutorial-1.0.3/docs/Control-Lens-Tutorial.html),
 it will cover a large fraction of your use cases.
+
+(Note: The tutorial refers to the `lens` library, not `microlens`.
+Roughly speaking, you can replace the `Control.Lens` in the tutorial with
+`Lens.Micro` and the code will still work.)
 
 ### Error handling
 
@@ -380,8 +401,8 @@ it will generate a report (either human readable or in JSON for consumption
 by other tools) that shows how much time different functions take to run.
 
 For simple cases, reading the profile manually is sufficient. For more complex
-situations, I recommend using the
-[flamegraph](https://github.com/brendangregg/FlameGraph) visualization tool.
+situations, I've used
+[flamegraph](https://github.com/brendangregg/FlameGraph) and highly recommend it.
 You can use `ghc-prof-aeson-flamegraph` as glue to convert GHC's
 JSON-formatted profile to something suitable for `flamegraph`.
 
@@ -407,6 +428,16 @@ stack exec --work-dir=".profile-dir" mybinary -- myinput.csv +RTS -pj
 cat mybinary.prof | ghc-prof-aeson-flamegraph | ../FlameGraph/flamegraph.pl > graph.svg
 # open graph.svg in a browser
 ```
+
+Reddit user gilmi [recommends](https://www.reddit.com/r/haskell/comments/c1srzr/an_opinionated_beginners_guide_to_haskell_in_mid/erfc7x0)
+[profiteur](https://github.com/jaspervdj/profiteur)
+for exploring profiles. The installation instructions there suggest using
+`cabal install profiteur`. As I said earlier, don't use `cabal install`.
+Instead, you can install `profiteur` as follows:
+
+(TODO: Add instructions or link on how to setup `profiteur`.)
+
+This will avoid mutating the global state of packages, preventing problems in the future.
 
 ## I'm still concerned ...
 
