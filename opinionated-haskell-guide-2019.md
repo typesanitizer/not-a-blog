@@ -177,6 +177,9 @@ Firefox sync, you can use the same shortcut with Firefox on your phone, so
 that you can quickly hoogle things while you're sitting on the toilet.
 You're welcome.
 
+If you use DuckDuckGo as your search engine, it already has [several shortcuts](https://duckduckgo.com/bang?c=Tech&sc=Languages+(Haskell))
+that make searching using Hoogle and Hackage easy. (h/t @Warbo for the tip!)
+
 #### Hlint
 
 [`hlint`](https://github.com/ndmitchell/hlint) is an excellent linter that will
@@ -204,18 +207,25 @@ Like with a lot of programming problems, it can be solved by copy-and-paste.
 If you're using `stack` as your build tool, the documentation describes how
 to setup Travis CI [here](https://docs.haskellstack.org/en/stable/travis_ci/).
 
-You could also get the CI configuration from another Haskell library (e.g. if
-you're using `cabal`). For example,
-[here](https://github.com/kowainik/relude/blob/master/.travis.yml) is
-the Travis CI file for the `relude` library, which has configuration for both
-`stack` and `cabal`. Or pick some other library, doesn't matter.
+Dmitrii Kovanikov has written a neat [how-to guide](https://chshersh.github.io/posts/2019-02-25-haskell-travis)
+for setting up CI for both `stack` and `cabal`.
 
-If you want something more configurable and cross-platform, take a look at
-[packcheck](https://github.com/composewell/packcheck).
+If you want something more flexible, you have a couple of options:
+
+* [summoner](https://github.com/kowainik/summoner) - it provides a flexible
+  way to setup your entire project, including CI (Travis and AppVeyor).
+  Includes a TUI and a CLI, whichever works for you.
+  The documentation for summoner is quite thorough!
+* [packcheck](https://github.com/composewell/packcheck) - this has CI
+  configuration for Travis, AppVeyor and CircleCI. Copy-paste and get going.
+
+There are also several [orbs for CircleCI](https://circleci.com/orbs/registry/?query=haskell&filterBy=all)
+(h/t /u/TheDataAngel for the [suggestion](https://www.reddit.com/r/haskell/comments/c1srzr/an_opinionated_beginners_guide_to_haskell_in_mid/erggvji)).
 
 If you're using Gitlab to host your source code, Gitlab CI is also a solid
-option. (TODO: Add a link on how to setup Gitlab CI easily for a Haskell
-project.)
+option. For example, [here](https://gitlab.com/gilmi/nyanpasu/blob/048368facb99121244561ba962e8a2dc880c80db/.gitlab-ci.yml)
+is a simple CI file to get you started (it uses an older Haskell version though,
+so you'll need to update that accordingly).
 
 ## Libraries
 
@@ -224,6 +234,10 @@ project.)
 Consult the [Aelve guide](https://guide.aelve.com/haskell) and
 [State of the Haskell ecosystem](https://github.com/Gabriel439/post-rfc/blob/master/sotu.md)
 for recommendations.
+
+You can also use [packdeps](https://packdeps.haskellers.com/reverse) to see which libraries
+are dependencies of several other libraries, to estimate popularity
+(h/t /u/Pcarbonn for the [suggestion](https://www.reddit.com/r/haskell/comments/c1srzr/an_opinionated_beginners_guide_to_haskell_in_mid/erjarrj)).
 
 Pick a library that is **well documented**. Your future self will thank you.
 
@@ -274,9 +288,34 @@ Don't use them. Most commonly, this comes up when working with lists, as some
 of the functions in `base` do not have sufficiently precise types. Trying using
 `NonEmpty` from `Data.List.NonEmpty` if you can.
 
-If you really must, use a partial function but write a short justification in
+~~If you really must, use a partial function but write a short justification in
 a comment for why there won't be any exceptions thrown. Sometimes, trying to
-write that justification will uncover a bug in your reasoning.
+write that justification will uncover a bug in your reasoning.~~
+
+If you really must use a partial function, strongly consider crashing with an
+informative error message (that helps you locate the failure source quickly),
+and an explanation for why you're crashing (to recall why you expect the
+invariant to hold in the first place). By default, GHC will not emit stack
+traces, so your program might crash with a generic "element not found in Map"
+or "Vector index out of bounds" which is not helpful, especially if you need
+to perform these operations in several places.
+
+```
+-- ! is the indexing operator which throws an exception on failure
+-- BAD
+
+let user = usersMap Map.! userId
+
+-- !? is the indexing operator that returns a Maybe in case the key isn't found
+-- BETTER
+
+-- We only hand out userIds for those users which are present in the map,
+-- and we never delete users, so the lookup shouldn't fail.
+let errorMsg i = error "Couldn't find user " ++ show i " in userMap." in
+let user = fromMaybe (errorMsg userId) (usersMap Map.!? userId)
+
+-- fromMaybe :: a -> Maybe a -> a comes from Data.Maybe in base
+```
 
 IO related functions are somewhat notorious for throwing exceptions for
 relatively common errors, such as a missing file. Try to be extra careful and
@@ -429,15 +468,12 @@ cat mybinary.prof | ghc-prof-aeson-flamegraph | ../FlameGraph/flamegraph.pl > gr
 # open graph.svg in a browser
 ```
 
-Reddit user gilmi [recommends](https://www.reddit.com/r/haskell/comments/c1srzr/an_opinionated_beginners_guide_to_haskell_in_mid/erfc7x0)
+/u/gilmi [recommends](https://www.reddit.com/r/haskell/comments/c1srzr/an_opinionated_beginners_guide_to_haskell_in_mid/erfc7x0)
 [profiteur](https://github.com/jaspervdj/profiteur)
-for exploring profiles. The installation instructions there suggest using
-`cabal install profiteur`. As I said earlier, don't use `cabal install`.
-Instead, you can install `profiteur` as follows:
-
-(TODO: Add instructions or link on how to setup `profiteur`.)
-
-This will avoid mutating the global state of packages, preventing problems in the future.
+and [profiterole](https://github.com/ndmitchell/profiterole)
+for exploring profiles. To install them, I recommend using `stack install profiteur profiterole`,
+instead of `cabal install` (as suggested in the `profiteur` instructions), to avoid package
+conflicts in the future.
 
 ## I'm still concerned ...
 
@@ -473,5 +509,5 @@ Happy Haskelling.
 
 ## Thanks
 
-Thanks to reddit user TracyChavez for [this comment](https://www.reddit.com/r/haskell/comments/c141zb/any_movement_on_development_of_haskell_the/erdl5f6)
+Thanks to /u/TracyChavez for [this comment](https://www.reddit.com/r/haskell/comments/c141zb/any_movement_on_development_of_haskell_the/erdl5f6)
 which prompted me to write this post.
