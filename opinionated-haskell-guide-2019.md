@@ -160,7 +160,23 @@ plugin if all else fails for you.
 
 ### Other tools
 
-#### Hoogle
+#### ghci - The REPL
+
+Your Haskell installation should come with a REPL called `ghci`. Here are a
+few tricks that I find super useful -
+
+* You can ask for the type of an expression using `:type foo`,
+  or more succinctly, `:t foo`.
+* You can set enable multiline input using `:set +m`, or enclosing code like so
+  `:{ foo :}`. Consult the
+  [GHC users guide](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/ghci.html#multiline-input)
+  for more details, including how to setup a config file so that you
+  don't need to remember to enable `:set +m` all the time.
+* If you're using `stack`, using `stack ghci` will load all the modules from
+  your package at the beginning. Check out `cabal v2-repl` if you're using
+  `cabal` instead.
+
+#### hoogle
 
 [`hoogle`](https://hoogle.haskell.org/) is a Haskell-specific search engine
 where you can not only search for functions/modules/packages by name, but also
@@ -180,7 +196,7 @@ You're welcome.
 If you use DuckDuckGo as your search engine, it already has [several shortcuts](https://duckduckgo.com/bang?c=Tech&sc=Languages+(Haskell))
 that make searching using Hoogle and Hackage easy. (h/t @Warbo for the tip!)
 
-#### Hlint
+#### hlint
 
 [`hlint`](https://github.com/ndmitchell/hlint) is an excellent linter that will
 suggest improvements to your code. In some languages, you might have had a bad
