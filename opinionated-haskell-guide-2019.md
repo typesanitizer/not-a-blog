@@ -410,7 +410,7 @@ You can write documentation tests too using [`doctest`](https://github.com/sol/d
 Try not to over-abstract. When writing Haskell, it is *extremely* tempting to
 build more sophisticated abstractions, to the detriment of everything else.
 
-![Thanos and Gamora meme](https://i.imgflip.com/33mzg6.jpg)
+![Meme: (child) Gamora: "Did you use every abstraction possible?". Thanos, "Yes.". Gamora: "And what did it cost?". Thanos (on the verge of tears), "Everything."](https://i.imgflip.com/33mzg6.jpg)
 
 On reddit, or mailing lists, or on Twitter, or elsewhere, you'll often find
 people talking about things that sound really cool. For example, recently,
